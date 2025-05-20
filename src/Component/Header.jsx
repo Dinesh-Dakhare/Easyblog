@@ -1,45 +1,41 @@
-import React from "react";
+import React, { useContext } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBarsStaggered } from "@fortawesome/free-solid-svg-icons";
 import { useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
+import { UserDataContext } from "../context/UserContext";
+import { useEffect } from "react";
 export const Header = () => {
-  const navigate = useNavigate();
-  const [open, setOpen] = useState(false);
-  const dropDown = () => {
-    setOpen((prev) => !prev);
-    console.log(open);
-  };
-  return (
-    <header className="flex justify-between pb-5 md:pb-10 lg:w-100vh  ">
-      <div onClick={(homeNavigation) => navigate("/")}>
-        <h1 className="text-black font-semibold text-2xl md:pt-2 md:text-3xl hover:cursor-pointer">EASYBLOG</h1>
-      </div>
-      <div className="md:hidden" onClick={() => dropDown()}>
-        <FontAwesomeIcon icon={faBarsStaggered} className="text-xl " />
-      </div>
-      <div className="max-sm:hidden flex gap-10 ">
-        <NavLink to={"/login"} className="pt-2 md:text-xl font-medium">LOGIN</NavLink>
-        <NavLink
-          to={"/blogform"}
-          className="rounded-lg text-blue-600 border p-2 md:text-xl font-medium"
-        >
-          NEW BLOG
-        </NavLink>
-      </div>
 
-      {/*Mobile view*/}
-      <div
-        className={
-          "fixed right-5 top-18  border-3 rounded-xl border-slate-200 z-20 transition duration-150 delay-100 ease-in-out bg-white  " +
-          (!open ? "translate-x-100" : "translate-x-0 ")
-        }
-      >
-        <div className="grid w-[10rem] p-2 rounded-lg text-lg font-medium space-y-2  ">
-          <NavLink>LOGIN</NavLink>
-          <NavLink to={"/blogform"} className="" onClick={() => dropDown()}>
-            NEW BLOG
+;
+  const token = localStorage.getItem("token")
+  
+  return (
+    // 
+     <header className="bg-white shadow-sm mb-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between items-center py-4">
+          <div className="flex items-center">
+          
+            <NavLink to={'/'} className="text-2xl font-bold text-gray-900">EASYBLOG</NavLink>
+          </div>
+             <div className="flex gap-10">
+               {!token ? (
+          <NavLink to={"/login"} className="pt-2 md:text-xl font-medium">
+            LOGIN
           </NavLink>
+        ) : (
+          <NavLink to={"/logout"} className="pt-2 md:text-xl font-medium">
+            LOGOUT
+          </NavLink>
+        )}
+          <button
+          
+            className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors flex items-center"
+          >
+         
+            <NavLink to={"/blogform"}>New Blog</NavLink>
+          </button>
+             </div>
         </div>
       </div>
     </header>

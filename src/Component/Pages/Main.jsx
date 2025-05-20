@@ -1,51 +1,57 @@
 import React, { useState } from "react";
+
+import axios from "axios";
 import Card from "../Card.jsx";
-import { useNavigate } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
+import { useContext } from "react";
+import { UserDataContext } from "../../context/UserContext.jsx";
+import { useEffect } from "react";
 const Main = () => {
   const navigate = useNavigate();
   const [blogtoggler, setBlogToggler] = useState(false);
-  const[currentTab,setCurrentTab]=useState("Blog")
-  const blogPreviewHandle = () => {
-    console.log("hellow");
-    navigate("/blog");
-  };
-  const blogTogglerHandler = () => {
+  const [blogs, setBlogs] = useState(null);
+ 
+
+  const getBlog = async (status) => {
     setBlogToggler((prev) => !prev);
-    console.log(blogtoggler);
+
+    try {
+      const res = await axios.post(
+        `${import.meta.env.VITE_BASE_URL}/blog/blogs`,{status},
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+      if (res.status === 200) {
+        console.log(res.data);
+        setBlogs(res.data.blogs);
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
+  useEffect(() => {
+    getBlog();
+  }, []);
+
+   if (blogs?.length === 0) {
+    return (
+      <div className="text-center py-12 bg-gray-50 rounded-lg border border-dashed border-gray-300">
+        <p className="text-gray-500">No blogs found. Create your first blog post!</p>
+      </div>
+    );
+  }
+
   return (
-    <div className="space-y-5 ">
-      <div className="w-full h-13 rounded-3xl bg-slate-200 flex justify-between items-center md:bg-white md:justify-start md:text-2xl md:ms-[-1rem] ">
-        <div
-          onClick={() => blogTogglerHandler()}
-          className={
-            "  font-semibold max-md:rounded-3xl p-2 w-40 h-10 ms-2 text-center transition duration-200 delay-100 ease-in-out md:text-center active: cursor-pointer  " +
-            (blogtoggler ? " " : "bg-white text-blue-600 ")
-          }
-        >
-          Blogs
-        </div>
-        <div
-          onClick={() => blogTogglerHandler()}
-          className={
-            "  font-semibold rounded-3xl p-2 w-40 h-10 me-2 text-center transition duration-300 delay-100 ease-in-out md:text-start md:me-16 active:text-blue-600 cursor-pointer " +
-            (blogtoggler ? "bg-white text-blue-600 " : " ")
-          }
-        >
-          Draft
-        </div>
-      </div>
-      <div
-        className="md:grid grid-cols-2 gap-6 max-sm:space-y-4 md:w-full md:justify-between lg:grid-cols-3 lg:px-10 lg:pt-10"
-        onClick={blogPreviewHandle}
-      >
-        <Card />
-        <Card />
-        <Card />
-        <Card />
-        <Card />
-        <Card />
-      </div>
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+       {
+          blogs?.map(elem=>{
+            return   <Card blog={elem} key={elem._id} />
+          })
+        }
+      
     </div>
   );
 };
